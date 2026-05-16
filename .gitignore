@@ -1,0 +1,47 @@
+# Node / pnpm
+node_modules
+.pnp
+.pnp.*
+
+# Builds & caches
+.next
+dist
+out
+.turbo
+.tsbuildinfo
+*.tsbuildinfo
+
+# Databases (Prisma dev SQLite)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite-journal
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode
+.idea
+*.swp
+*.swo
+
+# Claude Code local config
+.claude/
+
+# Document drafts (kept out of source tree)
+*.odt
+*.docx

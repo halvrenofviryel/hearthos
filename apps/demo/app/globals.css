@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #fbf9f4;
+  --color-ink: #1a1d24;
+  --color-ink-mute: #4a5058;
+  --color-accent: #3a6e90;
+  --color-rule: #d9d4c6;
+  --color-rule-soft: #ece8dc;
+  --color-good: #2f7a4e;
+  --color-warn: #c4583b;
+}
+
+html {
+  font-size: 16.5px;
+}
+
+html, body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.55;
+}
+
+body {
+  font-feature-settings: 'cv11', 'ss01';
+}
+
+.serif {
+  font-family: 'Iowan Old Style', 'Charter', Georgia, serif;
+}
+
+/* Smoother focus rings throughout the demo */
+*:focus-visible {
+  outline: 2px solid #0369a1;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Print styles — Weekly Reset is the primary print target. */
+@media print {
+  header, footer, nav { display: none !important; }
+  body { background: white !important; color: #1a1d24 !important; }
+  main { max-width: none !important; padding: 0 !important; }
+  .print\:hidden { display: none !important; }
+  /* Keep section borders soft for ink-friendly printing */
+  section { border-color: #c8c2b4 !important; box-shadow: none !important; }
+}

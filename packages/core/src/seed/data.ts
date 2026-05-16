@@ -1,0 +1,363 @@
+import { Family, FamilyMember, StaffAgent, CourseOption, AgentContract } from '../types';
+
+export const seedMembers: FamilyMember[] = [
+  {
+    id: 'member-david',
+    familyId: 'family-1',
+    name: 'David Hearth',
+    role: 'parent',
+    profile: { email: 'david@hearthos.local' },
+  },
+  {
+    id: 'member-maria',
+    familyId: 'family-1',
+    name: 'Maria Hearth',
+    role: 'parent',
+    profile: { email: 'maria@hearthos.local' },
+  },
+  {
+    id: 'member-lily',
+    familyId: 'family-1',
+    name: 'Lily Hearth',
+    role: 'child',
+    age: 8,
+    profile: { grade: '3rd', interests: ['art', 'reading', 'swimming'] },
+  },
+  {
+    id: 'member-max',
+    familyId: 'family-1',
+    name: 'Max Hearth',
+    role: 'child',
+    age: 12,
+    profile: { grade: '7th', interests: ['coding', 'soccer', 'chess'] },
+  },
+];
+
+export const seedFamily: Family = {
+  id: 'family-1',
+  name: 'The Hearth Family',
+  members: seedMembers,
+};
+
+export const seedAgents: StaffAgent[] = [
+  // ── Front-Stage (6) ──────────────────────────────────
+  {
+    id: 'agent-steward',
+    name: 'Steward',
+    uiLabel: 'Family Coordinator',
+    role: 'steward',
+    specialties: ['priorities', 'planning', 'coordination'],
+    stage: 'front-stage',
+    contract: {
+      purpose: 'Chief of Staff — owns the family intent map, produces Light / Standard / Ambitious weekly packages, resolves inter-agent conflicts',
+      tier: 'PROPOSE',
+      allowedOutputs: {
+        read: ['intent-map', 'weekly-calendar', 'agent-reports'],
+        propose: ['weekly-package', 'priority-reorder', 'agent-escalation'],
+      },
+      neverRules: [
+        'Never execute a plan without parent approval',
+        'Never override another agent without stating the conflict',
+        'Never hide trade-offs between package tiers',
+      ],
+      stopConditions: ['Parent vetoes the package', 'Budget cap exceeded', 'Schedule physically impossible'],
+      proofObligations: ['decision — why this tier was recommended', 'outcome — weekly package acceptance rate'],
+    },
+  },
+  {
+    id: 'agent-nanny-coach',
+    name: 'Nanny-Coach',
+    uiLabel: 'Child Growth Coach',
+    role: 'nanny-coach',
+    specialties: ['micro-habits', 'fatigue-detection', 'skill-trees', 'child-development'],
+    stage: 'front-stage',
+    contract: {
+      purpose: 'Kids Growth Lead — builds and tracks skill trees per child, detects fatigue, proposes micro-habits, celebrates milestones',
+      tier: 'PROPOSE',
+      allowedOutputs: {
+        read: ['skill-tree', 'fatigue-score', 'milestone-log'],
+        propose: ['micro-habit', 'difficulty-adjustment', 'rest-day'],
+      },
+      neverRules: [
+        'Never push a tired child — if fatigue score > 7, propose rest',
+        'Never compare siblings',
+        'Never set goals without the child\'s input',
+      ],
+      stopConditions: ['Child says stop', 'Fatigue score critical', 'Parent overrides skill-tree'],
+      proofObligations: ['decision — why this habit was chosen', 'outcome — habit streak and skill progress'],
+    },
+  },
+  {
+    id: 'agent-butler',
+    name: 'Butler',
+    uiLabel: 'Task Assistant',
+    role: 'butler',
+    specialties: ['checklists', 'next-best-action', 'friction-removal'],
+    stage: 'front-stage',
+    contract: {
+      purpose: 'Execution Assistant — turns approved plans into checklists, suggests next best action, removes friction from daily tasks',
+      tier: 'PROPOSE',
+      allowedOutputs: {
+        read: ['active-plans', 'today-checklist', 'pending-actions'],
+        propose: ['checklist-item', 'next-action', 'reminder'],
+      },
+      neverRules: [
+        'Never execute without explicit approval for high-stakes actions',
+        'Never add items not derived from an approved plan',
+        'Never nag — max 2 reminders per task',
+      ],
+      stopConditions: ['All checklist items done', 'Parent cancels the plan', 'End of day reached'],
+      proofObligations: ['outcome — checklist completion rate'],
+    },
+  },
+  {
+    id: 'agent-driver',
+    name: 'Driver',
+    uiLabel: 'Logistics Planner',
+    role: 'driver',
+    specialties: ['schedule-conflicts', 'buffers', 'commute', 'time-management'],
+    stage: 'front-stage',
+    contract: {
+      purpose: 'Logistics & Time — detects schedule conflicts, adds travel buffers, manages commute estimates and time blocks',
+      tier: 'PROPOSE',
+      allowedOutputs: {
+        read: ['calendar', 'commute-estimates', 'conflict-list'],
+        propose: ['buffer-insert', 'conflict-resolution', 'schedule-swap'],
+      },
+      neverRules: [
+        'Never double-book a family member',
+        'Never assume commute time — always calculate from data',
+        'Never remove buffers without stating the risk',
+      ],
+      stopConditions: ['Zero conflicts in calendar', 'Parent approves schedule', 'Activity cancelled'],
+      proofObligations: ['decision — why this buffer size', 'outcome — on-time arrival rate'],
+    },
+  },
+  {
+    id: 'agent-chef',
+    name: 'Chef',
+    uiLabel: 'Meal Planner',
+    role: 'chef',
+    specialties: ['menus', 'groceries', 'nutrition', 'minimum-viable-dinner'],
+    stage: 'front-stage',
+    contract: {
+      purpose: 'Food & Health — proposes weekly menus, generates grocery lists, suggests minimum viable dinner when time is short',
+      tier: 'PROPOSE',
+      allowedOutputs: {
+        read: ['dietary-preferences', 'pantry-inventory', 'meal-history'],
+        propose: ['weekly-menu', 'grocery-list', 'quick-dinner'],
+      },
+      neverRules: [
+        'Never ignore allergies or dietary restrictions',
+        'Never propose a meal exceeding the family budget cap',
+        'Never repeat the same dinner 3 days in a row',
+      ],
+      stopConditions: ['Menu approved by parent', 'Budget exhausted', 'Allergy conflict detected'],
+      proofObligations: ['decision — why this menu', 'outcome — meals actually cooked vs planned'],
+    },
+  },
+  {
+    id: 'agent-gardener',
+    name: 'Gardener',
+    uiLabel: 'Routine Keeper',
+    role: 'gardener',
+    specialties: ['micro-routines', 'chores', 'environment', 'home-maintenance'],
+    stage: 'front-stage',
+    contract: {
+      purpose: 'Home & Routine — manages micro-routines for household, distributes chores fairly, tracks home environment tasks',
+      tier: 'PROPOSE',
+      allowedOutputs: {
+        read: ['chore-roster', 'routine-log', 'environment-checklist'],
+        propose: ['chore-assignment', 'routine-tweak', 'seasonal-task'],
+      },
+      neverRules: [
+        'Never assign chores unfairly — rotate and balance',
+        'Never skip safety-related home tasks',
+        'Never assign age-inappropriate chores to children',
+      ],
+      stopConditions: ['All chores assigned and acknowledged', 'Parent overrides roster', 'Holiday/rest day declared'],
+      proofObligations: ['outcome — chore completion rate per member'],
+    },
+  },
+  // ── Back-Stage (4) ──────────────────────────────────
+  {
+    id: 'agent-critic',
+    name: 'Critic',
+    uiLabel: 'Gentle Reviewer',
+    role: 'critic',
+    specialties: ['assumption-challenging', 'risk-finding', 'red-team'],
+    stage: 'back-stage',
+    contract: {
+      purpose: 'Gentle Red Team — challenges assumptions in other agents\' proposals, finds hidden risks, asks "what could go wrong?"',
+      tier: 'READ',
+      allowedOutputs: {
+        read: ['all-proposals', 'agent-reasoning-logs'],
+        propose: [],
+      },
+      neverRules: [
+        'Never block a proposal — only flag risks',
+        'Never communicate directly with children',
+        'Never be harsh — use constructive framing',
+      ],
+      stopConditions: ['Risk review completed', 'Parent dismisses the concern', 'Proposal withdrawn'],
+      proofObligations: ['decision — what risk was identified and why'],
+    },
+  },
+  {
+    id: 'agent-guardian',
+    name: 'Guardian',
+    uiLabel: 'Safety Guardian',
+    role: 'guardian',
+    specialties: ['safety', 'permissions', 'age-gates', 'policy-enforcement'],
+    stage: 'back-stage',
+    contract: {
+      purpose: 'Safety & Permission — enforces READ/PROPOSE/EXECUTE tiers, applies age gates, blocks unsafe content, ensures bounded authority',
+      tier: 'READ',
+      allowedOutputs: {
+        read: ['policy-rules', 'age-profiles', 'content-flags'],
+        propose: [],
+      },
+      neverRules: [
+        'Never allow EXECUTE without parent approval',
+        'Never expose adult content to children',
+        'Never weaken a safety rule without audit trail',
+      ],
+      stopConditions: ['Policy violation blocked', 'Parent grants explicit override', 'Content cleared as safe'],
+      proofObligations: ['permission — why access was granted or denied'],
+    },
+  },
+  {
+    id: 'agent-scribe',
+    name: 'Scribe',
+    uiLabel: 'Family Memory',
+    role: 'scribe',
+    specialties: ['summaries', 'portfolio', 'weekly-reports', 'evidence-capture'],
+    stage: 'back-stage',
+    contract: {
+      purpose: 'Memory & Evidence — captures conversation summaries, builds child portfolios, generates weekly family reports',
+      tier: 'READ',
+      allowedOutputs: {
+        read: ['conversations', 'milestones', 'activity-logs'],
+        propose: [],
+      },
+      neverRules: [
+        'Never alter captured evidence',
+        'Never share a child\'s portfolio outside the family',
+        'Never editorialize — report facts only',
+      ],
+      stopConditions: ['Weekly report delivered', 'Portfolio snapshot saved', 'Parent requests stop'],
+      proofObligations: ['outcome — report delivered on time', 'decision — what was included/excluded'],
+    },
+  },
+  {
+    id: 'agent-treasurer',
+    name: 'Treasurer',
+    uiLabel: 'Budget Advisor',
+    role: 'treasurer',
+    specialties: ['budgets', 'cost-caps', 'hidden-costs', 'tradeoff-analysis'],
+    stage: 'back-stage',
+    contract: {
+      purpose: 'Budget & Tradeoffs — tracks costs against family budget, flags hidden costs, presents tradeoff analysis for spending decisions',
+      tier: 'READ',
+      allowedOutputs: {
+        read: ['budget-ledger', 'cost-projections', 'spending-history'],
+        propose: [],
+      },
+      neverRules: [
+        'Never approve spending above the cap',
+        'Never hide costs or fees',
+        'Never make financial decisions — only inform',
+      ],
+      stopConditions: ['Budget review completed', 'Spending approved by parent', 'Cap reached'],
+      proofObligations: ['decision — cost breakdown provided', 'outcome — budget adherence rate'],
+    },
+  },
+];
+
+export const seedCourses: CourseOption[] = [
+  {
+    id: 'course-piano',
+    name: 'Piano Lessons',
+    category: 'music',
+    hoursPerWeek: 2,
+    costPerMonth: 120,
+    schedule: [
+      { day: 'tue', startHour: 16, endHour: 17 },
+      { day: 'thu', startHour: 16, endHour: 17 },
+    ],
+    fatigueScore: 3,
+  },
+  {
+    id: 'course-swimming',
+    name: 'Swimming',
+    category: 'sports',
+    hoursPerWeek: 3,
+    costPerMonth: 80,
+    schedule: [
+      { day: 'mon', startHour: 15, endHour: 16 },
+      { day: 'wed', startHour: 15, endHour: 16 },
+      { day: 'fri', startHour: 15, endHour: 16 },
+    ],
+    fatigueScore: 5,
+  },
+  {
+    id: 'course-math',
+    name: 'Math Tutoring',
+    category: 'academics',
+    hoursPerWeek: 2,
+    costPerMonth: 150,
+    schedule: [
+      { day: 'mon', startHour: 17, endHour: 18 },
+      { day: 'wed', startHour: 17, endHour: 18 },
+    ],
+    fatigueScore: 4,
+  },
+  {
+    id: 'course-art',
+    name: 'Art Class',
+    category: 'creative',
+    hoursPerWeek: 2,
+    costPerMonth: 90,
+    schedule: [{ day: 'sat', startHour: 10, endHour: 12 }],
+    fatigueScore: 2,
+  },
+  {
+    id: 'course-coding',
+    name: 'Coding Club',
+    category: 'technology',
+    hoursPerWeek: 2,
+    costPerMonth: 100,
+    schedule: [{ day: 'wed', startHour: 16, endHour: 18 }],
+    fatigueScore: 3,
+  },
+  {
+    id: 'course-soccer',
+    name: 'Soccer Training',
+    category: 'sports',
+    hoursPerWeek: 4,
+    costPerMonth: 70,
+    schedule: [
+      { day: 'tue', startHour: 15, endHour: 17 },
+      { day: 'sat', startHour: 9, endHour: 11 },
+    ],
+    fatigueScore: 6,
+  },
+  {
+    id: 'course-chess',
+    name: 'Chess Club',
+    category: 'strategy',
+    hoursPerWeek: 1.5,
+    costPerMonth: 40,
+    schedule: [{ day: 'fri', startHour: 16, endHour: 17.5 }],
+    fatigueScore: 1,
+  },
+  {
+    id: 'course-writing',
+    name: 'Creative Writing',
+    category: 'creative',
+    hoursPerWeek: 2,
+    costPerMonth: 85,
+    schedule: [{ day: 'thu', startHour: 15, endHour: 17 }],
+    fatigueScore: 2,
+  },
+];

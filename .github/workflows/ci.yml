@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Setup Node ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Run tests (core)
+        run: pnpm --filter @hearthos/core test
+
+      - name: Type-check all packages
+        run: |
+          pnpm --filter @hearthos/core exec tsc --noEmit
+          pnpm --filter @hearthos/theme-sdk exec tsc --noEmit
+          pnpm --filter @hearthos/api exec tsc --noEmit
+          pnpm --filter @hearthos/chat exec tsc --noEmit
+          pnpm --filter @hearthos/console exec tsc --noEmit
+          pnpm --filter @hearthos/rpg exec tsc --noEmit

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HearthOS Starter Kit v0.1</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 18mm 18mm 22mm 18mm;
+    @bottom-center {
+      content: "HearthOS Starter Kit · v0.1 · page " counter(page) " of " counter(pages);
+      font-family: 'Inter', sans-serif;
+      font-size: 8pt;
+      color: #6a7280;
+    }
+    @top-right {
+      content: "hearthos";
+      font-family: 'Inter', sans-serif;
+      font-size: 8pt;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #6a7280;
+    }
+  }
+  @page :first {
+    margin: 0;
+    @bottom-center { content: none; }
+    @top-right { content: none; }
+  }
+
+  body {
+    font-family: 'Iowan Old Style', Georgia, 'Liberation Serif', serif;
+    color: #1a1d24;
+    background: #fbf9f4;
+    line-height: 1.55;
+    font-size: 10.5pt;
+    margin: 0;
+    padding: 0;
+    /* Disable auto-hyphenation to avoid soft-hyphen glyph substitution */
+    /* that some renderers show as replacement characters (e.g. "re￾grounded"). */
+    hyphens: manual;
+    -webkit-hyphens: manual;
+  }
+
+  .cover {
+    page-break-after: always;
+    height: 100vh;
+    background: #14181c;
+    color: #f4efe1;
+    padding: 40mm 20mm 25mm 20mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .cover .brand {
+    font-family: 'Inter', sans-serif;
+    font-size: 9pt;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #9b9582;
+  }
+  .cover h1 {
+    font-family: 'Inter', sans-serif;
+    font-size: 32pt;
+    line-height: 1.05;
+    margin: 18pt 0 14pt 0;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+  }
+  .cover .deck {
+    font-family: 'Iowan Old Style', Georgia, serif;
+    font-size: 14pt;
+    line-height: 1.4;
+    color: #d9d4c6;
+    max-width: 130mm;
+    font-style: italic;
+  }
+  .cover .position {
+    font-family: 'Inter', sans-serif;
+    font-size: 10pt;
+    line-height: 1.55;
+    color: #9b9582;
+    max-width: 140mm;
+    margin-top: 32pt;
+  }
+  .cover .position strong { color: #f4efe1; font-weight: 600; }
+  .cover .meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 8pt;
+    color: #6a7280;
+    letter-spacing: 0.05em;
+    border-top: 1px solid #2e343a;
+    padding-top: 12pt;
+  }
+
+  h2 {
+    font-family: 'Inter', sans-serif;
+    font-size: 18pt;
+    color: #0e1218;
+    line-height: 1.15;
+    margin: 0 0 4pt 0;
+    page-break-after: avoid;
+    letter-spacing: -0.005em;
+    font-weight: 600;
+  }
+  h2 + .section-deck {
+    font-family: 'Inter', sans-serif;
+    font-size: 9.5pt;
+    color: #6a7280;
+    margin: 0 0 14pt 0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 12pt;
+    color: #0e1218;
+    margin: 16pt 0 6pt 0;
+    line-height: 1.25;
+    font-weight: 600;
+  }
+  h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 9pt;
+    color: #6a7280;
+    margin: 12pt 0 4pt 0;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+  p { margin: 0 0 7pt 0; }
+  strong { color: #0e1218; }
+  em { color: #4a5058; }
+
+  .section { page-break-before: always; }
+  .section.first { page-break-before: auto; }
+
+  ul, ol { margin: 4pt 0 9pt 0; padding-left: 16pt; }
+  li { margin-bottom: 4pt; line-height: 1.55; }
+  li > ul, li > ol { margin-top: 4pt; }
+
+  .callout {
+    background: #f4efe1;
+    border-left: 3pt solid #3a6e90;
+    padding: 8pt 12pt;
+    margin: 10pt 0;
+    font-style: italic;
+    color: #2e343a;
+    page-break-inside: avoid;
+  }
+  .callout.warn { border-left-color: #c4583b; background: #f7e8e0; }
+  .callout.good { border-left-color: #2f7a4e; background: #e3eed9; }
+  .callout p:last-child { margin-bottom: 0; }
+
+  .template {
+    background: white;
+    border: 0.5pt solid #c8c2b4;
+    border-radius: 3pt;
+    padding: 10pt 12pt;
+    margin: 8pt 0 12pt 0;
+    page-break-inside: avoid;
+  }
+  .template h4 {
+    margin-top: 0;
+    color: #3a6e90;
+  }
+  .template .blank {
+    border-bottom: 0.4pt dotted #b0a890;
+    min-height: 12pt;
+    margin: 4pt 0;
+  }
+  .template .blank.tall { min-height: 22pt; }
+
+  .script-card {
+    background: white;
+    border: 0.5pt solid #c8c2b4;
+    border-radius: 3pt;
+    padding: 8pt 11pt;
+    margin: 6pt 0;
+    page-break-inside: avoid;
+  }
+  .script-card .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6a7280;
+    margin-bottom: 3pt;
+  }
+  .script-card .label.soft   { color: #2f7a4e; }
+  .script-card .label.firm   { color: #3a6e90; }
+  .script-card .label.repair { color: #6a4d8a; }
+  .script-card .quote {
+    font-family: 'Iowan Old Style', Georgia, serif;
+    font-size: 10pt;
+    font-style: italic;
+    color: #1a1d24;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8pt 0 12pt 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 9pt;
+  }
+  th, td {
+    padding: 5pt 8pt;
+    text-align: left;
+    border-bottom: 0.4pt solid #c8c2b4;
+    vertical-align: top;
+    line-height: 1.4;
+  }
+  th {
+    background: #ece8dc;
+    font-weight: 600;
+    color: #0e1218;
+    border-bottom: 0.7pt solid #4a5058;
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .checkbox {
+    display: inline-block;
+    width: 9pt;
+    height: 9pt;
+    border: 0.6pt solid #4a5058;
+    margin-right: 6pt;
+    vertical-align: -1pt;
+    border-radius: 1.5pt;
+  }
+
+  .footer-note {
+    margin-top: 18pt;
+    padding-top: 8pt;
+    border-top: 0.4pt solid #c8c2b4;
+    font-family: 'Inter', sans-serif;
+    font-size: 8pt;
+    color: #6a7280;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<!-- ─────────────────────────────────────── COVER ─────────────────────────────────────── -->
+<section class="cover">
+  <div>
+    <div class="brand">HearthOS · Starter Kit</div>
+    <h1>Turn daily chaos into clear routines, safe boundaries, and parent-approved decisions.</h1>
+    <p class="deck">
+      Most AI assistants answer. HearthOS separates suggestion from authority — every output is a
+      proposal; only the parent executes.
+    </p>
+    <p class="position">
+      <strong>HearthOS is not an AI that runs your family.</strong> It is a <strong>bounded-authority
+      system</strong> that helps parents (and any responsible adult holding execution authority)
+      see, plan, and approve family decisions. This Starter Kit is the printable companion to the
+      public demo at phionyx.ai/hearthos — a short set of templates and patterns you can use on
+      Sunday evening, no AI required.
+    </p>
+  </div>
+  <div class="meta">
+    Version 0.1 · Code AGPL-3.0; Starter Kit text: share freely with attribution
+    · Source &amp; demo: github.com/halvrenofviryel/hearthos
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────── PAGE 1: WHAT IT IS ─────────────────────────────────────── -->
+<section class="section first">
+  <h2>What HearthOS is</h2>
+  <p class="section-deck">A bounded-authority pattern, applied to a household.</p>
+
+  <p>HearthOS is a small reference implementation of a household AI orchestration model: ten named
+  agents coordinate around one family, and every action they propose passes through a three-tier
+  policy that gates by role. <strong>Only a parent can EXECUTE.</strong> Children and agents can
+  read or propose; they cannot act unilaterally.</p>
+
+  <p>The bounded-authority pattern has three moving parts:</p>
+
+  <h3>1. The agents propose</h3>
+  <p>Ten agents — six "front-stage" (visible to children) and four "back-stage" (review and audit
+  only). Each ships a written contract: what it can read, what it may propose, what it must
+  never do, when it must stop, and what evidence it must produce.</p>
+
+  <h3>2. The parent executes</h3>
+  <p>Every state-changing action passes through the PolicyEngine. EXECUTE is reserved for the
+  parent. High-stakes actions (subscriptions, payments, schedule changes, external sharing) are
+  sub-classified and require explicit approval before they fire — no autopilot.</p>
+
+  <h3>3. The system remembers</h3>
+  <p>Every significant action emits an activity event with actor, action, resource, decision, and
+  reason. The activity log is visible to the parent; nothing happens off the record.</p>
+
+  <div class="callout">
+    <p><strong>Why this matters:</strong> the market is full of AI assistants that answer
+    immediately. HearthOS implements the simpler discipline of <em>"propose, then wait."</em>
+    Decisions about money, sharing, schedule, and child wellbeing should never run on autopilot.</p>
+  </div>
+
+  <h3>The three demo modules</h3>
+  <table>
+    <thead><tr><th style="width:30%">Module</th><th>What you get</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Diagnostic</strong></td><td>Twelve quick questions about your household — load, friction, clarity, fatigue, risk. Three minutes to a five-dimensional read of what's elevated this week. (Capture your scores below.)</td></tr>
+      <tr><td><strong>Weekly Reset</strong></td><td>Fifteen minutes to plan the week: three priorities, three child tasks, meal rhythm, risks to watch, and an explicit list of decisions that need parent approval. (Template included.)</td></tr>
+      <tr><td><strong>Boundary Script</strong></td><td>One-line description of a recurring tough moment in, three matched scripts out — soft / firm / repair. Pick the one that fits the moment. (Patterns included.)</td></tr>
+    </tbody>
+  </table>
+
+  <p>The demo runs entirely in your browser. No account, no personal child names required, no data
+  leaves the tab unless you choose to copy it out or download this PDF.</p>
+
+  <h3>Your Diagnostic results — capture them here</h3>
+  <p>If you ran the Diagnostic in the demo, jot the five household signals below for reference. The
+  scale is 0&ndash;100; higher means more concern for load, friction, fatigue, and risk; higher means
+  more clarity (which is the only goodness signal).</p>
+
+  <div class="template">
+    <h4>This week's household signals</h4>
+    <p>Load:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="display:inline-block;width:30pt;border-bottom:0.4pt dotted #b0a890;">&nbsp;</span> &nbsp;/ 100
+       &nbsp;&nbsp;&nbsp;Friction:&nbsp;&nbsp;<span style="display:inline-block;width:30pt;border-bottom:0.4pt dotted #b0a890;">&nbsp;</span> &nbsp;/ 100
+       &nbsp;&nbsp;&nbsp;Clarity:&nbsp;&nbsp;&nbsp;<span style="display:inline-block;width:30pt;border-bottom:0.4pt dotted #b0a890;">&nbsp;</span> &nbsp;/ 100</p>
+    <p>Fatigue:&nbsp;&nbsp;&nbsp;<span style="display:inline-block;width:30pt;border-bottom:0.4pt dotted #b0a890;">&nbsp;</span> &nbsp;/ 100
+       &nbsp;&nbsp;&nbsp;Risk:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="display:inline-block;width:30pt;border-bottom:0.4pt dotted #b0a890;">&nbsp;</span> &nbsp;/ 100</p>
+    <p style="margin-top:8pt;">Recommended first module:
+      &nbsp;<span style="display:inline-block;width:60%;border-bottom:0.4pt dotted #b0a890;height:11pt;"></span></p>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────── PAGE 2: WEEKLY RESET TEMPLATE ─────────────────────────────────────── -->
+<section class="section">
+  <h2>Weekly Reset — template</h2>
+  <p class="section-deck">Fifteen minutes on Sunday. One sheet on the fridge.</p>
+
+  <p>Use this template after running the Weekly Reset module in the demo, or fill it in by hand
+  with your co-parent. The order matters: <strong>approval queue first</strong>, because those are
+  the decisions that should not be made later in a tired moment.</p>
+
+  <div class="template">
+    <h4>Parent approval queue — what should not run on autopilot this week</h4>
+    <p class="blank tall"></p>
+    <p class="blank tall"></p>
+    <p class="blank tall"></p>
+    <p style="font-size:8pt;color:#6a7280;margin-top:4pt;">
+      Hold these for an explicit yes / modify / no with your co-parent. Default categories worth
+      checking: subscriptions / payments, sharing decisions about the children, schedule changes
+      that affect more than one person, agreements about screen rules.
+    </p>
+  </div>
+
+  <div class="template">
+    <h4>Three family priorities for this week</h4>
+    <p>1. <span class="blank tall" style="display:inline-block;width:75%;border-bottom:0.4pt dotted #b0a890;"></span></p>
+    <p>2. <span class="blank tall" style="display:inline-block;width:75%;border-bottom:0.4pt dotted #b0a890;"></span></p>
+    <p>3. <span class="blank tall" style="display:inline-block;width:75%;border-bottom:0.4pt dotted #b0a890;"></span></p>
+    <p style="font-size:8pt;color:#9b9582;font-style:italic;margin-top:4pt;">
+      Example: Move tomorrow's lunch prep to tonight. &nbsp;|&nbsp;
+      Example: Screens off thirty minutes before bedtime.
+    </p>
+  </div>
+
+  <div class="template">
+    <h4>Three child-side tasks (age-appropriate, one per child if possible)</h4>
+    <p>1. <span class="blank tall" style="display:inline-block;width:72%;border-bottom:0.4pt dotted #b0a890;"></span></p>
+    <p>2. <span class="blank tall" style="display:inline-block;width:72%;border-bottom:0.4pt dotted #b0a890;"></span></p>
+    <p>3. <span class="blank tall" style="display:inline-block;width:72%;border-bottom:0.4pt dotted #b0a890;"></span></p>
+    <p style="font-size:8pt;color:#9b9582;font-style:italic;margin-top:4pt;">
+      Example: Pack tomorrow's school bag the night before. &nbsp;|&nbsp;
+      Example: Read one chapter before screen time.
+    </p>
+  </div>
+
+  <div class="template">
+    <h4>Meal and routine rhythm — one sentence</h4>
+    <p class="blank tall"></p>
+    <p class="blank tall"></p>
+    <p style="font-size:8pt;color:#9b9582;font-style:italic;margin-top:4pt;">
+      Example: Three planned dinners + two flex slots; lunches packed the night before.
+    </p>
+  </div>
+
+  <div class="template">
+    <h4>Risks to watch — what could go off the rails this week</h4>
+    <p>· <span style="display:inline-block;width:90%;border-bottom:0.4pt dotted #b0a890;height:11pt;"></span></p>
+    <p>· <span style="display:inline-block;width:90%;border-bottom:0.4pt dotted #b0a890;height:11pt;"></span></p>
+    <p>· <span style="display:inline-block;width:90%;border-bottom:0.4pt dotted #b0a890;height:11pt;"></span></p>
+    <p style="font-size:8pt;color:#9b9582;font-style:italic;margin-top:4pt;">
+      Example: School form sign-off slipping past Wednesday. &nbsp;|&nbsp;
+      Example: Late-week routine drift after Tuesday.
+    </p>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────── PAGE 3: BOUNDARY SCRIPT PATTERNS ─────────────────────────────────────── -->
+<section class="section">
+  <h2>Boundary script patterns</h2>
+  <p class="section-deck">Three tones, one situation at a time. Pick by moment, not by mood.</p>
+
+  <p>The same boundary can be held three ways. The choice depends on this moment — not the last
+  one. <strong>Soft</strong> when the relationship is fragile and the rule can hold without
+  escalation. <strong>Firm</strong> when the rule has slipped and needs to be re&#8209;established &mdash; not
+  when a child is already dysregulated. <strong>Repair</strong> after the hard moment has already
+  passed; the rule still stands, but the relationship is foregrounded.</p>
+
+  <h3>Screen time</h3>
+  <div class="script-card">
+    <div class="label soft">Soft</div>
+    <p class="quote">"Hey — I can see you're in the middle of something good. Five more minutes and then we'll wrap up together. Can you find a stopping point?"</p>
+  </div>
+  <div class="script-card">
+    <div class="label firm">Firm</div>
+    <p class="quote">"Screens off at the agreed time, every day. I'm not negotiating it tonight; I'll be happy to talk about the rule itself tomorrow when neither of us is tired."</p>
+  </div>
+  <div class="script-card">
+    <div class="label repair">Repair</div>
+    <p class="quote">"Earlier was hard for both of us. The boundary still stands, but I want you to know I'm not angry at you — I'm holding the rule, not blaming you for wanting more time."</p>
+  </div>
+
+  <h3>Bedtime</h3>
+  <div class="script-card">
+    <div class="label soft">Soft</div>
+    <p class="quote">"Bedtime's coming up in fifteen minutes. What's the one thing you want to finish before we start the wind-down?"</p>
+  </div>
+  <div class="script-card">
+    <div class="label firm">Firm</div>
+    <p class="quote">"Lights out at the agreed time. The order is negotiable; the time is not. I'll see you in the morning."</p>
+  </div>
+  <div class="script-card">
+    <div class="label repair">Repair</div>
+    <p class="quote">"Last night was rough. The bedtime still stands, but I want you to know I noticed how hard you tried to settle."</p>
+  </div>
+
+  <h3>Mealtime</h3>
+  <div class="script-card">
+    <div class="label soft">Soft</div>
+    <p class="quote">"You don't have to finish it. I just need you to try the new thing once, sitting at the table with us."</p>
+  </div>
+  <div class="script-card">
+    <div class="label firm">Firm</div>
+    <p class="quote">"Dinner is what's on the table tonight. You don't have to eat it, but I'm not making something separate at this hour. We'll have a snack option at the agreed time."</p>
+  </div>
+  <div class="script-card">
+    <div class="label repair">Repair</div>
+    <p class="quote">"Tonight got tense — that wasn't about you, it was about the timing. The rule about meals stays, but I'm sorry it landed sharp."</p>
+  </div>
+
+  <h3>Homework / schoolwork</h3>
+  <div class="script-card">
+    <div class="label soft">Soft</div>
+    <p class="quote">"You don't have to enjoy it. You do have to spend the time. Twenty minutes of real effort, even if it's imperfect."</p>
+  </div>
+  <div class="script-card">
+    <div class="label firm">Firm</div>
+    <p class="quote">"The homework window is the homework window. We're not adding screen time before it's done, and we're not extending it past bedtime."</p>
+  </div>
+  <div class="script-card">
+    <div class="label repair">Repair</div>
+    <p class="quote">"I pushed too hard about the grade. The effort is the part I care about; I should have said that more clearly."</p>
+  </div>
+
+  <h3>Sibling friction</h3>
+  <div class="script-card">
+    <div class="label soft">Soft</div>
+    <p class="quote">"I'm not going to decide who started it. I'm going to decide what happens next: a five-minute pause, then a quick check-in with both of you."</p>
+  </div>
+  <div class="script-card">
+    <div class="label firm">Firm</div>
+    <p class="quote">"In this house we don't fix things by yelling. Whoever is shouting steps out of the room until they can speak normally."</p>
+  </div>
+  <div class="script-card">
+    <div class="label repair">Repair</div>
+    <p class="quote">"Earlier I picked a side too fast. The rule about how you treat each other stays, but I owe both of you a more careful listen next time."</p>
+  </div>
+
+  <h3>Refusal / pushback</h3>
+  <div class="script-card">
+    <div class="label soft">Soft</div>
+    <p class="quote">"I hear that you don't want to. I'm not changing what needs to happen, but I want to know what would make it easier."</p>
+  </div>
+  <div class="script-card">
+    <div class="label firm">Firm</div>
+    <p class="quote">"I'm not going to argue this one. The answer is the answer; we can talk about why later, but not in the middle of a refusal."</p>
+  </div>
+  <div class="script-card">
+    <div class="label repair">Repair</div>
+    <p class="quote">"Earlier you said no and I heard angry. I heard the no — I just couldn't move on the rule. I'm not angry at you for pushing back."</p>
+  </div>
+
+  <h3>Which tone, when</h3>
+  <table>
+    <thead><tr><th style="width:25%">If the moment is…</th><th style="width:18%">Use</th><th>Because</th></tr></thead>
+    <tbody>
+      <tr><td>Calm, child still has agency</td><td><strong>Soft</strong></td><td>Holds the line without forcing escalation</td></tr>
+      <tr><td>Rule already slipping repeatedly</td><td><strong>Firm</strong></td><td>Restates the line in plain language; no negotiation</td></tr>
+      <tr><td>Right after a hard moment ended</td><td><strong>Repair</strong></td><td>The rule survives; the relationship is foregrounded</td></tr>
+      <tr><td>Child is already dysregulated</td><td><em>None of the three</em></td><td>Co&#8209;regulate first; script the boundary later when both of you can hear it</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ─────────────────────────────────────── PAGE 4: PARENT APPROVAL CHECKLIST ─────────────────────────────────────── -->
+<section class="section">
+  <h2>Parent approval checklist</h2>
+  <p class="section-deck">Eight categories worth holding for explicit yes / modify / no.</p>
+
+  <p>These are the categories the Weekly Reset's approval queue surfaces by default. Each represents
+  a decision pattern that benefits from a deliberate parent-only call rather than a default-yes.
+  Use the checkboxes to tick the ones already covered by an agreement in your household this week;
+  leave the others as discussion items for your next family check-in.</p>
+
+  <h3>Financial</h3>
+  <p><span class="checkbox"></span> Subscription / payment renewal or change requires explicit parent approval — not implicit by silence.</p>
+  <p><span class="checkbox"></span> Money decisions over the agreed family threshold pause for one overnight before execution.</p>
+
+  <h3>External sharing</h3>
+  <p><span class="checkbox"></span> Sharing a child's photo, schedule, or work outside the family — explicit approval each time.</p>
+  <p><span class="checkbox"></span> Sharing a household routine publicly (social, parent groups) — always parent decision, never agent default.</p>
+
+  <h3>School &amp; activities</h3>
+  <p><span class="checkbox"></span> School or activity sign-up needs parent sign-off, even if a child started the form.</p>
+  <p><span class="checkbox"></span> Any commitment over an hour of weekly time needs the responsible adult(s) to confirm before it joins the calendar.</p>
+
+  <h3>Schedule &amp; permissions</h3>
+  <p><span class="checkbox"></span> Schedule changes that affect more than one family member need a quick check before being confirmed.</p>
+  <p><span class="checkbox"></span> Permissions to attend events away from the family default to "ask the responsible adult first".</p>
+
+  <h3>Add your own</h3>
+  <div class="template">
+    <p>· <span style="display:inline-block;width:88%;border-bottom:0.4pt dotted #b0a890;height:11pt;"></span></p>
+    <p>· <span style="display:inline-block;width:88%;border-bottom:0.4pt dotted #b0a890;height:11pt;"></span></p>
+    <p>· <span style="display:inline-block;width:88%;border-bottom:0.4pt dotted #b0a890;height:11pt;"></span></p>
+  </div>
+
+  <div class="callout good">
+    <p><strong>The principle behind every item.</strong> Decisions made by exhaustion get reversed
+    later. Holding a small set of categories for explicit approval — even when the answer is
+    obvious — costs almost nothing and saves the household from accidental commitments.</p>
+  </div>
+
+  <div class="footer-note">
+    <p>HearthOS Starter Kit · v0.1 · Reference application, not a clinical tool, not a hosted
+    service. Source and the live demo: <strong>github.com/halvrenofviryel/hearthos</strong>.
+    Public demo: <strong>phionyx.ai/hearthos</strong>.</p>
+    <p>Code is licensed <strong>AGPL-3.0</strong>; the Starter Kit text on these pages is free to
+    share with attribution. This kit accompanies the demo but stands on its own — none of the
+    pages above require AI, a server, or an account. Print, copy, fold, share.</p>
+  </div>
+</section>
+
+</body>
+</html>
