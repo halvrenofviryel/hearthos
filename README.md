@@ -1,5 +1,12 @@
 # HearthOS
 
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tests](https://img.shields.io/badge/tests-174_passing-success)](#testing)
+[![Demo](https://img.shields.io/badge/demo-phionyx.ai%2Fhearthos-7E5FA0)](https://phionyx.ai/hearthos)
+[![Kindle](https://img.shields.io/badge/Kindle_Book-HearthOS-FF9900?logo=amazon&logoColor=white)](https://www.amazon.co.uk/dp/B0GX2WJY77)
+[![Related: phionyx-research](https://img.shields.io/badge/related-phionyx--research-1f242a?logo=github)](https://github.com/halvrenofviryel/phionyx-research)
+
 > **HearthOS helps families turn daily chaos into clear routines, safe boundaries, and parent-approved decisions.**
 >
 > Most AI assistants answer. HearthOS separates suggestion from authority — every output is a proposal; only the parent executes.
