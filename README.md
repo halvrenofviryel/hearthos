@@ -4,6 +4,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tests](https://img.shields.io/badge/tests-174_passing-success)](#testing)
 [![Demo](https://img.shields.io/badge/demo-phionyx.ai%2Fhearthos-7E5FA0)](https://phionyx.ai/hearthos)
+[![Pillar](https://img.shields.io/badge/pillar-Bounded_Authority-A75A2F)](https://phionyx.ai/bounded-authority)
 [![Kindle](https://img.shields.io/badge/Kindle_Book-HearthOS-FF9900?logo=amazon&logoColor=white)](https://www.amazon.co.uk/dp/B0GX2WJY77)
 [![Related: phionyx-research](https://img.shields.io/badge/related-phionyx--research-1f242a?logo=github)](https://github.com/halvrenofviryel/phionyx-research)
 
@@ -12,6 +13,8 @@
 > Most AI assistants answer. HearthOS separates suggestion from authority — every output is a proposal; only the parent executes.
 >
 > *Powered by bounded-authority AI orchestration.*
+
+> 🧭 **Where this fits on [phionyx.ai](https://phionyx.ai):** HearthOS surfaces under [**phionyx.ai/bounded-authority**](https://phionyx.ai/bounded-authority) as the household-scale demonstration of the bounded-authority pattern. The same primitives — scope, safety, ethics, state, approval, audit — scale up to the enterprise-grade Phionyx runtime documented at [phionyx.ai/sdk](https://phionyx.ai/sdk).
 
 HearthOS is a reference implementation of a bounded-authority household AI orchestration model: ten named agents, a three-tier policy engine (READ / PROPOSE / EXECUTE), explicit safety and approval gates, and a family-readable activity history. Built in TypeScript, runs offline by default with a deterministic mock LLM adapter, and ships a small public demo (Diagnostic / Weekly Reset / Boundary Script) that demonstrates the pattern in three minutes.
 
