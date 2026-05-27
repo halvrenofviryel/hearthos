@@ -3,6 +3,28 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { DemoStepper } from '@/components/DemoStepper';
+import { AuditChainPanel } from '@/components/AuditChainPanel';
+import { useBoundedAuthorityEnvelope } from '@/lib/phionyx/useBoundedAuthorityEnvelope';
+import type { AuthorityBlock } from '@/lib/phionyx/envelope';
+
+// Weekly Reset uses execute-with-review tier — every queued action
+// requires explicit parent approval before it counts as executed.
+// Matches scripts/active/generate_hearthos_pinned_traces.py
+// EXECUTE_WITH_REVIEW_AUTHORITY.
+const EXECUTE_WITH_REVIEW_AUTHORITY: AuthorityBlock = {
+  tier: 'EXECUTE',
+  subclass: 'execute-with-review',
+  contract_id: 'hearthos.steward.v1',
+  contract_version: '1.0.0',
+  never_rules_active: [
+    "never act on a child's request without parent visibility",
+    'never override an existing parent-set rule silently',
+  ],
+  stop_conditions_active: [
+    'two-consecutive-rejections-from-parent',
+    'family-member-marks-urgent',
+  ],
+};
 
 // ──────────────────────────────────────────────────────────────────────
 // Inputs
@@ -288,24 +310,127 @@ export default function WeeklyResetPage() {
   const [copied, setCopied] = useState(false);
   const [decisions, setDecisions] = useState<Map<number, ApprovalDecision>>(new Map());
 
+  const audit = useBoundedAuthorityEnvelope({
+    traceId: 'demo-family-weekly-reset',
+    scenarioId: 'weekly_reset',
+    packageVersion: '0.1.0',
+  });
+
   function update<K extends keyof Inputs>(key: K, value: Inputs[K]) {
     setInputs({ ...inputs, [key]: value });
   }
 
   function handleGenerate() {
-    setOutput(generate(inputs));
+    const newOutput = generate(inputs);
+    setOutput(newOutput);
     setCopied(false);
     setDecisions(new Map());
+    audit.reset();
+
+    // Emit the plan-proposal envelope. Each action in the approval
+    // queue is a PROPOSE-tier proposal that will need parent approval
+    // via execute-with-review subclass before counting as executed.
+    void audit.emit({
+      producer: 'hearthos.steward',
+      event_type: 'propose',
+      authority: EXECUTE_WITH_REVIEW_AUTHORITY,
+      proposal: {
+        action_id: `wr-plan-${inputKey(inputs)}`,
+        action_kind: 'weekly_plan_draft',
+        action_payload: {
+          inputs: { ...inputs },
+          queued_actions: newOutput.approvalQueue.length,
+        },
+        rationale_summary: 'Draft a balanced week using the supplied family inputs.',
+        proof_obligations_declared: ['decision', 'outcome'],
+      },
+    });
+  }
+
+  async function approverIdHash(role: string): Promise<string> {
+    // SHA-256 of a stable per-role identifier for the demo. The
+    // hashing pattern matches scripts/active/generate_hearthos_pinned_traces.py
+    const enc = new TextEncoder().encode(`parent.${role}@demo-family`);
+    const buf = await crypto.subtle.digest('SHA-256', enc);
+    return Array.from(new Uint8Array(buf))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
   }
 
   function decide(idx: number, decision: ApprovalDecision) {
     const next = new Map(decisions);
-    if (next.get(idx) === decision) {
+    const isToggleOff = next.get(idx) === decision;
+    if (isToggleOff) {
       next.delete(idx); // toggle off
     } else {
       next.set(idx, decision);
     }
     setDecisions(next);
+
+    // Only emit on the SET (not toggle-off) and only for approved /
+    // declined (not "modified" — that one is informational in the
+    // demo, no audit value).
+    if (isToggleOff || !output) return;
+    if (decision === 'modified') return;
+
+    const actionText = output.approvalQueue[idx];
+    if (!actionText) return;
+    const actionId = `wr-action-${inputKey(inputs)}-${idx}`;
+
+    void (async () => {
+      const idHash = await approverIdHash('alice');
+
+      // Step 1: execute_requested envelope (queued action enters approval queue)
+      await audit.emit({
+        producer: 'hearthos.steward',
+        event_type: 'execute_requested',
+        authority: EXECUTE_WITH_REVIEW_AUTHORITY,
+        proposal: {
+          action_id: actionId,
+          action_kind: 'weekly_plan_action',
+          action_payload: { description: actionText },
+          rationale_summary: `Queue action: ${actionText}`,
+          proof_obligations_declared: ['permission', 'outcome'],
+        },
+      });
+
+      // Step 2: parent decision envelope
+      await audit.emit({
+        producer: 'hearthos.steward',
+        event_type: decision === 'approved' ? 'execute_approved' : 'execute_rejected',
+        authority: EXECUTE_WITH_REVIEW_AUTHORITY,
+        proposal: {
+          action_id: actionId,
+          action_kind: 'weekly_plan_action',
+          action_payload: { description: actionText },
+          rationale_summary: `Queue action: ${actionText}`,
+          proof_obligations_declared: ['permission', 'outcome'],
+        },
+        approval: {
+          queue_id: `queue-${actionId}`,
+          decision: decision === 'approved' ? 'approved' : 'rejected',
+          approver_role: 'parent',
+          approver_id_hash: idHash,
+          reason: decision === 'approved' ? null : 'Parent declined.',
+        },
+      });
+
+      // Step 3 (only if approved): execute_completed
+      if (decision === 'approved') {
+        await audit.emit({
+          producer: 'hearthos.steward',
+          event_type: 'execute_completed',
+          authority: EXECUTE_WITH_REVIEW_AUTHORITY,
+          proposal: {
+            action_id: actionId,
+            action_kind: 'weekly_plan_action',
+            action_payload: { description: actionText },
+            rationale_summary: `Queue action: ${actionText}`,
+            proof_obligations_declared: ['permission', 'outcome'],
+          },
+        });
+      }
+    })();
   }
 
   function resetDecisions() {
@@ -551,6 +676,12 @@ export default function WeeklyResetPage() {
           Nothing about your family is collected; the same inputs always produce the same plan.
         </section>
       )}
+
+      <AuditChainPanel
+        chain={audit.chain}
+        onDownload={audit.downloadJsonl}
+        onReset={audit.reset}
+      />
     </div>
   );
 }

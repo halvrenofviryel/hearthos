@@ -15,12 +15,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="min-h-screen flex flex-col">
           <header className="border-b border-stone-300 bg-stone-50/80 backdrop-blur">
             <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
-              <Link
-                href="/"
-                className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 hover:text-slate-700"
-              >
-                HearthOS
-              </Link>
+              <div className="flex items-center gap-4">
+                <a
+                  href="/hearthos"
+                  className="text-sm text-slate-500 hover:text-slate-800"
+                  aria-label="Back to HearthOS overview on phionyx.ai"
+                >
+                  ← HearthOS overview
+                </a>
+                <Link
+                  href="/"
+                  className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 hover:text-slate-700"
+                >
+                  HearthOS
+                </Link>
+              </div>
               <nav className="flex gap-5 sm:gap-7 text-sm text-slate-600">
                 <Link href="/diagnostic" className="hover:text-slate-900">Diagnostic</Link>
                 <Link href="/weekly-reset" className="hover:text-slate-900">Weekly Reset</Link>

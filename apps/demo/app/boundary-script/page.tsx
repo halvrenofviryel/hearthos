@@ -1,6 +1,46 @@
 'use client';
 
 import { useState } from 'react';
+import { AuditChainPanel } from '@/components/AuditChainPanel';
+import { useBoundedAuthorityEnvelope } from '@/lib/phionyx/useBoundedAuthorityEnvelope';
+import type { AuthorityBlock } from '@/lib/phionyx/envelope';
+
+// Authority blocks — match scripts/active/generate_hearthos_pinned_traces.py
+const NANNY_COACH_AUTHORITY: AuthorityBlock = {
+  tier: 'PROPOSE',
+  subclass: null,
+  contract_id: 'hearthos.nanny_coach.v1',
+  contract_version: '1.0.0',
+  never_rules_active: [
+    'never make medical claims',
+    'never recommend punishment',
+  ],
+  stop_conditions_active: [
+    'fatigue-signal-detected-three-turns',
+  ],
+};
+
+const GUARDIAN_AUTHORITY: AuthorityBlock = {
+  tier: 'READ',
+  subclass: null,
+  contract_id: 'hearthos.guardian.v1',
+  contract_version: '1.0.0',
+  never_rules_active: [
+    'never store boundary-script outputs flagged sensitive',
+  ],
+  stop_conditions_active: [
+    'sensitive-content-rate-exceeded',
+  ],
+};
+
+// SHA-256 hex of an input string (for safety_gate.input_hash)
+async function sha256Hex(text: string): Promise<string> {
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
 import Link from 'next/link';
 import { DemoStepper } from '@/components/DemoStepper';
 import { evaluateInputSafety, type SafetyGateResult } from '@hearthos/core';
@@ -284,11 +324,63 @@ export default function BoundaryScriptPage() {
   >(null);
   const [copiedTone, setCopiedTone] = useState<Tone | null>(null);
 
+  const audit = useBoundedAuthorityEnvelope({
+    traceId: 'demo-family-boundary-script',
+    scenarioId: 'boundary_script',
+    packageVersion: '0.1.0',
+  });
+
   function handleGenerate() {
     if (!input.trim()) return;
     const safety = evaluateInputSafety(input);
-    setResult({ ...generateScripts(input), safety });
+    const generated = generateScripts(input);
+    setResult({ ...generated, safety });
     setCopiedTone(null);
+    audit.reset();
+
+    void (async () => {
+      // Step 1 — Guardian safety gate envelope. Spec §6 rule 3: the
+      // envelope is emitted whether verdict is admit, block, or
+      // redact. Censorship of the audit trail is not allowed.
+      const inputHash = `sha256:${await sha256Hex(input)}`;
+      await audit.emit({
+        producer: 'hearthos.guardian',
+        event_type: 'safety_gate_blocked',
+        authority: GUARDIAN_AUTHORITY,
+        safety_gate: {
+          gate_id: 'sensitive_area_v1',
+          input_hash: inputHash,
+          verdict: safety.triggered ? 'block' : 'admit',
+          reason: safety.rationale,
+        },
+      });
+
+      // Step 2 — only emit script proposals when the gate admits.
+      // When the gate blocks, the chain stops at the safety_gate
+      // envelope; the UI may still show advice, but no PROPOSE
+      // envelope is recorded (the bounded-authority pattern says
+      // blocked content does not enter the propose stream).
+      if (!safety.triggered) {
+        for (const s of generated.scripts) {
+          await audit.emit({
+            producer: 'hearthos.nanny_coach',
+            event_type: 'propose',
+            authority: NANNY_COACH_AUTHORITY,
+            proposal: {
+              action_id: `bs-${s.tone}-${generated.category.key}`,
+              action_kind: 'boundary_script_draft',
+              action_payload: {
+                tone: s.tone,
+                category: generated.category.key,
+                category_label: generated.category.label,
+              },
+              rationale_summary: `Generate ${s.tone} boundary script for: ${generated.category.label}.`,
+              proof_obligations_declared: ['decision'],
+            },
+          });
+        }
+      }
+    })();
   }
 
   async function handleCopy(text: string, tone: Tone) {
@@ -465,6 +557,12 @@ export default function BoundaryScriptPage() {
           </ul>
         </section>
       )}
+
+      <AuditChainPanel
+        chain={audit.chain}
+        onDownload={audit.downloadJsonl}
+        onReset={audit.reset}
+      />
     </div>
   );
 }

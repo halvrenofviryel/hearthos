@@ -1,9 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { DemoStepper } from '@/components/DemoStepper';
 import { StarterKitDownload } from '@/components/StarterKitDownload';
+import { AuditChainPanel } from '@/components/AuditChainPanel';
+import { useBoundedAuthorityEnvelope } from '@/lib/phionyx/useBoundedAuthorityEnvelope';
+import type { AuthorityBlock } from '@/lib/phionyx/envelope';
 import {
   concernBand,
   dominantConcern,
@@ -12,6 +15,26 @@ import {
   type DimensionKind,
   type ConcernBand,
 } from '@hearthos/core';
+
+// ──────────────────────────────────────────────────────────────────────
+// Phionyx bounded-authority — Steward authority block (PROPOSE-only)
+// Matches the pinned trace generator at
+// scripts/active/generate_hearthos_pinned_traces.py STEWARD_AUTHORITY.
+// ──────────────────────────────────────────────────────────────────────
+const STEWARD_AUTHORITY: AuthorityBlock = {
+  tier: 'PROPOSE',
+  subclass: null,
+  contract_id: 'hearthos.steward.v1',
+  contract_version: '1.0.0',
+  never_rules_active: [
+    "never act on a child's request without parent visibility",
+    'never override an existing parent-set rule silently',
+  ],
+  stop_conditions_active: [
+    'two-consecutive-rejections-from-parent',
+    'family-member-marks-urgent',
+  ],
+};
 
 // HouseholdState type + banding helpers live in @hearthos/core
 // (packages/core/src/state/household-state.ts). The demo owns the
@@ -263,6 +286,14 @@ export default function DiagnosticPage() {
   const [step, setStep] = useState<'questions' | 'result'>('questions');
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<Map<number, number>>(new Map());
+  const [summaryEmitted, setSummaryEmitted] = useState(false);
+
+  // Phionyx bounded-authority envelope chain for this session
+  const audit = useBoundedAuthorityEnvelope({
+    traceId: 'demo-family-diagnostic',
+    scenarioId: 'diagnostic',
+    packageVersion: '0.1.0',
+  });
 
   const current = QUESTIONS[currentIdx];
   const progress = Math.round((currentIdx / QUESTIONS.length) * 100);
@@ -272,6 +303,29 @@ export default function DiagnosticPage() {
     const next = new Map(answers);
     next.set(current.id, idx);
     setAnswers(next);
+
+    // Emit a PROPOSE envelope — Steward records the question being
+    // surfaced + the user's answer choice. The chain captures the
+    // sequence of diagnostic signals without storing any personal
+    // content beyond the answer index.
+    void audit.emit({
+      producer: 'hearthos.steward',
+      event_type: 'propose',
+      authority: STEWARD_AUTHORITY,
+      proposal: {
+        action_id: `diag-q-${String(current.id).padStart(2, '0')}`,
+        action_kind: 'diagnostic_question',
+        action_payload: {
+          question_index: current.id,
+          question_text: current.text,
+          answer_index: idx,
+          answer_text: current.options[idx],
+          dimension: current.dimension,
+        },
+        rationale_summary: `Surface diagnostic signal via question ${current.id} (${current.dimension}).`,
+        proof_obligations_declared: ['decision'],
+      },
+    });
   }
 
   function goNext() {
@@ -292,6 +346,8 @@ export default function DiagnosticPage() {
     setAnswers(new Map());
     setCurrentIdx(0);
     setStep('questions');
+    setSummaryEmitted(false);
+    audit.reset();
   }
 
   if (step === 'result') {
@@ -306,6 +362,37 @@ export default function DiagnosticPage() {
       { key: 'fatigue', label: 'Parent Decision Fatigue', value: state.fatigue, kind: 'concern', description: 'Cumulative decision load on the parent.' },
       { key: 'risk', label: 'Risk', value: state.risk, kind: 'concern', description: 'Decisions made ad-hoc that could go wrong.' },
     ];
+
+    // Emit the recommendation envelope once when entering the result
+    // step. This carries the dominant-concern + first-move proposal.
+    // Wrapped in useEffect (via summaryEmitted guard) so React's
+    // double-invocation in dev does not double-emit.
+    if (!summaryEmitted && answers.size >= QUESTIONS.length) {
+      setSummaryEmitted(true);
+      void audit.emit({
+        producer: 'hearthos.steward',
+        event_type: 'propose',
+        authority: STEWARD_AUTHORITY,
+        proposal: {
+          action_id: 'diag-recommend-first-move',
+          action_kind: 'recommendation',
+          action_payload: {
+            signal_summary: {
+              load: state.load,
+              friction: state.friction,
+              clarity: state.clarity,
+              fatigue: state.fatigue,
+              risk: state.risk,
+            },
+            recommended_module: rec.label,
+            recommendation_reason: rec.reason,
+            recommendation_headline: rec.headline,
+          },
+          rationale_summary: `Signal pattern matches ${rec.label} primary concern; recommend that module as first move.`,
+          proof_obligations_declared: ['decision'],
+        },
+      });
+    }
 
     return (
       <div>
@@ -383,6 +470,12 @@ export default function DiagnosticPage() {
             ← Back to home
           </Link>
         </div>
+
+        <AuditChainPanel
+          chain={audit.chain}
+          onDownload={audit.downloadJsonl}
+          onReset={audit.reset}
+        />
       </div>
     );
   }
@@ -448,6 +541,11 @@ export default function DiagnosticPage() {
           {currentIdx + 1 >= QUESTIONS.length ? 'See your signals →' : 'Next →'}
         </button>
       </div>
+
+      <AuditChainPanel
+        chain={audit.chain}
+        onDownload={audit.downloadJsonl}
+      />
     </div>
   );
 }
