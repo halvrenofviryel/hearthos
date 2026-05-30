@@ -14,7 +14,7 @@
 >
 > *Powered by bounded-authority AI orchestration.*
 
-> 🧭 **Where this fits on [phionyx.ai](https://phionyx.ai):** HearthOS surfaces under [**phionyx.ai/bounded-authority**](https://phionyx.ai/bounded-authority) as the household-scale demonstration of the bounded-authority pattern. The same primitives — scope, safety, ethics, state, approval, audit — scale up to the enterprise-grade Phionyx runtime documented at [phionyx.ai/sdk](https://phionyx.ai/sdk).
+> 🧭 **Where this fits on [phionyx.ai](https://phionyx.ai):** HearthOS surfaces under [**phionyx.ai/bounded-authority**](https://phionyx.ai/bounded-authority) as the household-scale demonstration of the bounded-authority pattern. The same primitives — scope, safety, ethics, state, approval, audit — appear at full fidelity across three distinct, separately-versioned upstream artefacts: the **engine** [`phionyx-core`](https://github.com/halvrenofviryel/phionyx-research) (the deterministic-cognition SDK; the 46-block canonical pipeline), the **self-governance gate** [`phionyx-pipeline-mcp`](https://pypi.org/project/phionyx-pipeline-mcp/) (the MCP server that verifies an agent's own claims against git-diff truth), and the vendor-neutral **Evaluation Standard** [`phionyx-evaluation-standard`](https://github.com/halvrenofviryel/phionyx-research) (the L0–L3 / D0–D3 / CG-L0…CG-L5 scales). HearthOS itself is a browser-only TypeScript reference app — it does **not** import any of those at runtime. See [phionyx.ai/sdk](https://phionyx.ai/sdk) for the engine and [phionyx.ai/maturity](https://phionyx.ai/maturity) for the gate and the claim-governance ladder.
 
 HearthOS is a reference implementation of a bounded-authority household AI orchestration model: ten named agents, a three-tier policy engine (READ / PROPOSE / EXECUTE), explicit safety and approval gates, and a family-readable activity history. Built in TypeScript, runs offline by default with a deterministic mock LLM adapter, and ships a small public demo (Diagnostic / Weekly Reset / Boundary Script) that demonstrates the pattern in three minutes.
 
@@ -163,7 +163,13 @@ pnpm --filter @hearthos/theme-sdk exec tsc --noEmit
 
 ## Phionyx-Lite
 
-A handful of gates in `@hearthos/core` (`gates/input-safety-gate.ts`, `gates/human-approval-gate.ts`) are inspired by — but **not the same as** — the heavier governance pipeline of the [phionyx-research](https://github.com/halvrenofviryel/phionyx-research) project. HearthOS does not import the full 46-block pipeline, the Φ telemetry, or the signed audit chain. Those live in a separate ecosystem.
+A handful of gates in `@hearthos/core` (`gates/input-safety-gate.ts`, `gates/human-approval-gate.ts`) are inspired by — but **not the same as** — the upstream Phionyx artefacts, each of which is a separate project with its own version line:
+
+- **Engine** — [`phionyx-core`](https://github.com/halvrenofviryel/phionyx-research) (the deterministic-cognition SDK): the full **46-block canonical pipeline (contract v3.8.0)**, the physics-based state telemetry, and the signed audit chain. HearthOS imports **none** of these.
+- **Self-governance gate** — [`phionyx-pipeline-mcp`](https://pypi.org/project/phionyx-pipeline-mcp/): the MCP server that verifies an agent's own "I fixed / I tested / this changed" claims against git-diff truth. This is the component the claim-governance ladder (CG-L0…CG-L5) rates — distinct from the SDK and from HearthOS.
+- **Evaluation Standard** — [`phionyx-evaluation-standard`](https://github.com/halvrenofviryel/phionyx-research): the vendor-neutral spec that defines the L0–L3 (evaluation maturity), D0–D3 (determinism), and CG-L0…CG-L5 (claim-governance) scales against which any runtime can be placed.
+
+HearthOS does not import the full 46-block pipeline, the physics telemetry, or the signed audit chain. Those live in the separate `phionyx-research` ecosystem above.
 
 A future `@hearthos/phionyx-adapter` package (not yet built) is the planned home for opt-in hash-chained activity export and richer telemetry integration. Until that ships, the activity stream here is a programmatic journal — useful for in-process audit, not a tamper-evident chain.
 
