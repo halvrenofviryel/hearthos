@@ -2,7 +2,7 @@
  * AuditChainPanel — surfaces the live Phionyx bounded-authority envelope
  * chain for the current demo session.
  *
- * Renders below each module (Diagnostic / Weekly Reset / Boundary Script).
+ * Renders below each module (Household Check / Weekly Reset / Boundary Script).
  * Shows:
  *   - Live envelope count for the session
  *   - Latest envelope's event_type + integrity.current (truncated)

@@ -1,11 +1,11 @@
 import Link from 'next/link';
 
 interface DemoStepperProps {
-  active: 'diagnostic' | 'weekly-reset' | 'boundary-script';
+  active: 'household-check' | 'weekly-reset' | 'boundary-script';
 }
 
 const STEPS = [
-  { id: 'diagnostic', n: 1, label: 'Diagnostic', href: '/diagnostic' },
+  { id: 'household-check', n: 1, label: 'Household Check', href: '/household-check' },
   { id: 'weekly-reset', n: 2, label: 'Weekly Reset', href: '/weekly-reset' },
   { id: 'boundary-script', n: 3, label: 'Boundary Script', href: '/boundary-script' },
 ] as const;

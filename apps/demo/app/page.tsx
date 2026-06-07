@@ -18,10 +18,10 @@ export default function HomePage() {
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <Link
-            href="/diagnostic"
+            href="/household-check"
             className="inline-flex items-center gap-2 text-base font-semibold bg-sky-700 hover:bg-sky-800 text-white px-6 py-3 rounded-lg shadow-sm transition-colors"
           >
-            Start the 3-minute Diagnostic →
+            Start the 3-minute Household Check →
           </Link>
           <Link
             href="/weekly-reset"
@@ -57,12 +57,12 @@ export default function HomePage() {
       <section className="grid md:grid-cols-3 gap-4 mb-12">
         <ModuleCard
           icon="🔎"
-          title="Diagnostic"
+          title="Household Check"
           benefit="Find your household's pressure points in three minutes."
           output="Output: load · friction · clarity · fatigue · risk"
           time="≈ 3 min"
-          cta="Start diagnostic →"
-          href="/diagnostic"
+          cta="Start the check →"
+          href="/household-check"
           primary
         />
         <ModuleCard

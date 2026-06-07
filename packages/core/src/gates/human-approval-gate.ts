@@ -13,6 +13,8 @@
 // that is the PolicyEngine's job and runs first. The approval gate
 // runs *after* allow has been granted, and decides what UX is
 // required before the action actually fires.
+//
+// Phionyx profile: SAFETY GATE (the boundary). See docs/PHIONYX_PROFILES.md.
 // ──────────────────────────────────────────────────────────────────────
 
 import { PolicyEngine } from '../policy/engine';

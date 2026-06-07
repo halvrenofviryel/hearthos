@@ -31,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </Link>
               </div>
               <nav className="flex gap-5 sm:gap-7 text-sm text-slate-600">
-                <Link href="/diagnostic" className="hover:text-slate-900">Diagnostic</Link>
+                <Link href="/household-check" className="hover:text-slate-900">Household Check</Link>
                 <Link href="/weekly-reset" className="hover:text-slate-900">Weekly Reset</Link>
                 <Link href="/boundary-script" className="hover:text-slate-900">Boundary Script</Link>
               </nav>

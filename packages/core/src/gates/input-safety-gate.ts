@@ -12,6 +12,8 @@
 // no learned model. The point is to make the bounded-authority pattern
 // *visible* — the family should see when a proposal touches something
 // that should never run on autopilot.
+//
+// Phionyx profile: SAFETY GATE (the boundary). See docs/PHIONYX_PROFILES.md.
 // ──────────────────────────────────────────────────────────────────────
 
 export type SensitiveCategory =

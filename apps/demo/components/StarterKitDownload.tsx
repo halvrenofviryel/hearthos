@@ -23,7 +23,7 @@ export function StarterKitDownload() {
             Download the HearthOS Starter Kit
           </h3>
           <p className="text-sm text-slate-600 mb-3 leading-relaxed">
-            A short, printable companion to the demo. Includes a Diagnostic-results capture page,
+            A short, printable companion to the demo. Includes a Household Check results capture page,
             a Weekly Reset template, six boundary-script categories (soft / firm / repair
             examples), and the parent-approval checklist. No AI required.
           </p>

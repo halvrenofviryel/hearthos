@@ -16,13 +16,13 @@
 
 > 🧭 **Where this fits on [phionyx.ai](https://phionyx.ai):** HearthOS surfaces under [**phionyx.ai/bounded-authority**](https://phionyx.ai/bounded-authority) as the household-scale demonstration of the bounded-authority pattern. The same primitives — scope, safety, ethics, state, approval, audit — appear at full fidelity across three distinct, separately-versioned upstream artefacts: the **engine** [`phionyx-core`](https://github.com/halvrenofviryel/phionyx-research) (the deterministic SDK; the 46-block canonical pipeline), the **self-governance gate** [`phionyx-pipeline-mcp`](https://pypi.org/project/phionyx-pipeline-mcp/) (the MCP server that verifies an agent's own claims against git-diff truth), and the vendor-neutral **AI Runtime Evidence Protocol (AIREP)** [`ai-runtime-evidence-protocol`](https://github.com/halvrenofviryel/ai-runtime-evidence-protocol) — an experimental, proposed open format for a per-decision *AI decision receipt*: one signed, hash-chained, offline-checkable record per runtime decision, readable by anyone and tied to no vendor. HearthOS itself is a browser-only TypeScript reference app — it does **not** import any of those at runtime. See [phionyx.ai/sdk](https://phionyx.ai/sdk) for the engine.
 
-HearthOS is a reference implementation of a bounded-authority household AI orchestration model: ten named agents, a three-tier policy engine (READ / PROPOSE / EXECUTE), explicit safety and approval gates, and a family-readable activity history. Built in TypeScript, runs offline by default with a deterministic mock LLM adapter, and ships a small public demo (Diagnostic / Weekly Reset / Boundary Script) that demonstrates the pattern in three minutes.
+HearthOS is a reference implementation of a bounded-authority household AI orchestration model: ten named agents, a three-tier policy engine (READ / PROPOSE / EXECUTE), explicit safety and approval gates, and a family-readable activity history. Built in TypeScript, runs offline by default with a deterministic mock LLM adapter, and ships a small public demo (Household Check / Weekly Reset / Boundary Script) that demonstrates the pattern in three minutes.
 
 It is intentionally **not** a product, not a hosted service, and not certified for any regulatory regime. It is a reference application — the kind of thing you read, run locally, fork, and adapt.
 
 ## Public demo vs reference surfaces
 
-`apps/demo` is the public-facing HearthOS funnel — three browser-only screens (Diagnostic, Weekly Reset, Boundary Script) designed for families and reachable from `phionyx.ai/hearthos`. No database, no API, no LLM. It runs entirely in the browser session.
+`apps/demo` is the public-facing HearthOS funnel — three browser-only screens (Household Check, Weekly Reset, Boundary Script) designed for families and reachable from `phionyx.ai/hearthos`. No database, no API, no LLM. It runs entirely in the browser session.
 
 `apps/chat` and `apps/console` are **reference surfaces** for developers and reviewers who want to inspect how the orchestrator, theme SDK, agent contracts, and chat-control console fit together on top of the same `@hearthos/core` package. They are not production services and they are not part of the public funnel.
 
@@ -33,7 +33,7 @@ If you are evaluating HearthOS as a family-tech demo, start with `apps/demo`. If
 ```
 hearthos/
 ├── apps/
-│   ├── demo/          # Public demo — Diagnostic, Weekly Reset, Boundary Script (port 3300)
+│   ├── demo/          # Public demo — Household Check, Weekly Reset, Boundary Script (port 3300)
 │   ├── chat/          # Vivid Chat theme — full orchestrator UI (port 3000)
 │   └── console/       # Read-only chat-control console (port 3200)
 ├── packages/
@@ -100,7 +100,7 @@ Three browser-only screens that demonstrate the bounded-authority pattern in thr
 
 | Route | What it does | Typical run time |
 |---|---|---|
-| `/diagnostic` | Twelve quick questions → a five-dimensional `HouseholdState` (load / friction / clarity / fatigue / risk) and a single recommended next move. | ≈ 3 min |
+| `/household-check` | Twelve quick questions → a five-dimensional `HouseholdState` (load / friction / clarity / fatigue / risk) and a single recommended next move. | ≈ 3 min |
 | `/weekly-reset` | Generates the week's three priorities, three child tasks, meal rhythm, risks to watch, and an explicit **parent-approval queue** ("these decisions should not run on autopilot"). | ≈ 5 min |
 | `/boundary-script` | Describe a recurring tough moment in one line → three matched scripts (soft / firm / repair). Inputs touching sensitive areas trigger the **input-safety gate**, which surfaces a visible "this needs explicit parent approval" banner. | ≈ 2 min |
 
@@ -161,9 +161,23 @@ pnpm --filter @hearthos/theme-sdk exec tsc --noEmit
 5. **Offline-capable.** A deterministic mock LLM adapter ships in core — no API key, no network call.
 6. **Auditable.** Every significant action emits an entry; the public-facing UI surfaces these as *activity history*.
 
-## Phionyx-Lite
+## Two Phionyx profiles, made concrete
 
-A handful of gates in `@hearthos/core` (`gates/input-safety-gate.ts`, `gates/human-approval-gate.ts`) are inspired by — but **not the same as** — the upstream Phionyx artefacts, each of which is a separate project with its own version line:
+Phionyx is deployed as a **runtime profile** — a named subset of governance
+behaviour for the job in front of you. HearthOS is a worked example of **two**
+of them, and you can watch both run in the [browser demo](https://phionyx.ai/hearthos):
+
+| Profile | In HearthOS | Watch it live |
+|---|---|---|
+| **Safety Gate** (the boundary) | `gates/input-safety-gate.ts` + `gates/human-approval-gate.ts` + the READ / PROPOSE / EXECUTE policy engine: sensitive input is flagged and escalates to a parent; nothing executes from the AI side. | Boundary Script — type a line about money or a doctor; the gate fires and asks for parent approval. |
+| **Evidence** (the notary) | `apps/demo/lib/phionyx/envelope.ts`: each step becomes a signed, hash-chained `bounded_authority_envelope` record; `verifyChain()` detects tampering; `verifyBoundedAuthority()` checks 7 preservation rules. | Any module — download the audit chain `.jsonl`, change a byte, re-verify; the chain names the broken step. |
+
+→ **Full mapping, code tour, and the honest boundaries:** [`docs/PHIONYX_PROFILES.md`](docs/PHIONYX_PROFILES.md).
+The profiles, formally: [phionyx.ai/profiles](https://phionyx.ai/profiles).
+
+### How this relates to the upstream Phionyx projects
+
+The gates in `@hearthos/core` (`gates/input-safety-gate.ts`, `gates/human-approval-gate.ts`) are inspired by — but **not the same as** — the upstream Phionyx artefacts, each of which is a separate project with its own version line. HearthOS imports **none** of them at runtime:
 
 - **Engine** — [`phionyx-core`](https://github.com/halvrenofviryel/phionyx-research) (the deterministic SDK): the full **46-block canonical pipeline (contract v3.8.0)**, the physics-based state telemetry, and the signed audit chain. HearthOS imports **none** of these.
 - **Self-governance gate** — [`phionyx-pipeline-mcp`](https://pypi.org/project/phionyx-pipeline-mcp/): the MCP server that verifies an agent's own "I fixed / I tested / this changed" claims against git-diff truth — distinct from the SDK and from HearthOS.

@@ -13,8 +13,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - `apps/console` is now a **read-only chat-control surface**. The `family/`, `themes/`, and `agents/new` routes have been removed; the `agents` and `agents/[id]` routes are read-only inspectors of the agent contracts that live in `@hearthos/core` seed data. A new `threads/` route surfaces the chat threads the orchestrator has opened. The dashboard now centres on chat overview rather than family management.
 - Console sidebar subtitle changed from "Father Console" to the neutral "Chat Console". Sidebar items reduced from six to four (Dashboard, Threads, Agents, Activity).
 - README updated to reflect the removal of `apps/rpg` and the simplification of `apps/console`. The "Public demo vs reference surfaces" section now lists only `apps/chat` and `apps/console` alongside `apps/demo`.
+- Renamed the public demo's first module from **Diagnostic** to **Household Check** (route `/diagnostic` → `/household-check`; the old route 301-redirects on phionyx.ai). "Diagnostic" read as a clinical claim the demo does not make; "Household Check" matches what the module is — a 3-minute household self-check. The pinned reference trace was regenerated to match (`demo-household-check-v1.jsonl`).
 
 ### Added
+- `docs/PHIONYX_PROFILES.md` — a map of how HearthOS demonstrates two Phionyx runtime profiles (the **Safety Gate** and the **Evidence** profile), with a code tour and explicit boundaries.
 - `services/api` test suite — **15 Supertest integration tests across 4 files** covering `/api/health`, `/api/agents` (list / filter / single / 404), `/api/threads` (list / create / read / messages), `/api/audit`, `/api/plans`, and `/api/family/members`. Total workspace test count: **174 tests** (159 core + 15 API).
 - `CONTRIBUTING.md` — what is in / out of scope, repo layout, development setup, coding conventions, test instructions, scope-bounds.
 - `SECURITY.md` — scope, supported versions, reporting process, soft guarantees the project will defend.

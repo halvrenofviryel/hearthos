@@ -282,7 +282,7 @@ function Bar({ value, kind }: { value: number; kind: DimensionKind }) {
 // Page component
 // ──────────────────────────────────────────────────────────────────────
 
-export default function DiagnosticPage() {
+export default function HouseholdCheckPage() {
   const [step, setStep] = useState<'questions' | 'result'>('questions');
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<Map<number, number>>(new Map());
@@ -290,8 +290,8 @@ export default function DiagnosticPage() {
 
   // Phionyx bounded-authority envelope chain for this session
   const audit = useBoundedAuthorityEnvelope({
-    traceId: 'demo-family-diagnostic',
-    scenarioId: 'diagnostic',
+    traceId: 'demo-family-household-check',
+    scenarioId: 'household-check',
     packageVersion: '0.1.0',
   });
 
@@ -306,15 +306,15 @@ export default function DiagnosticPage() {
 
     // Emit a PROPOSE envelope — Steward records the question being
     // surfaced + the user's answer choice. The chain captures the
-    // sequence of diagnostic signals without storing any personal
+    // sequence of household signals without storing any personal
     // content beyond the answer index.
     void audit.emit({
       producer: 'hearthos.steward',
       event_type: 'propose',
       authority: STEWARD_AUTHORITY,
       proposal: {
-        action_id: `diag-q-${String(current.id).padStart(2, '0')}`,
-        action_kind: 'diagnostic_question',
+        action_id: `hc-q-${String(current.id).padStart(2, '0')}`,
+        action_kind: 'household_check_question',
         action_payload: {
           question_index: current.id,
           question_text: current.text,
@@ -322,7 +322,7 @@ export default function DiagnosticPage() {
           answer_text: current.options[idx],
           dimension: current.dimension,
         },
-        rationale_summary: `Surface diagnostic signal via question ${current.id} (${current.dimension}).`,
+        rationale_summary: `Surface household signal via question ${current.id} (${current.dimension}).`,
         proof_obligations_declared: ['decision'],
       },
     });
@@ -374,7 +374,7 @@ export default function DiagnosticPage() {
         event_type: 'propose',
         authority: STEWARD_AUTHORITY,
         proposal: {
-          action_id: 'diag-recommend-first-move',
+          action_id: 'hc-recommend-first-move',
           action_kind: 'recommendation',
           action_payload: {
             signal_summary: {
@@ -396,7 +396,7 @@ export default function DiagnosticPage() {
 
     return (
       <div>
-        <DemoStepper active="diagnostic" />
+        <DemoStepper active="household-check" />
         <header className="mb-6">
           <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 mb-2">Your household signals</h1>
           <p className="text-slate-600 max-w-2xl">
@@ -483,9 +483,9 @@ export default function DiagnosticPage() {
   // ─── Question step ──────────────────────────────────────────────────
   return (
     <div>
-      <DemoStepper active="diagnostic" />
+      <DemoStepper active="household-check" />
       <header className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 mb-2">HearthOS Diagnostic</h1>
+        <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 mb-2">HearthOS Household Check</h1>
         <p className="text-slate-600 max-w-2xl">
           Twelve quick questions. About three minutes. Nothing is stored — your answers stay in this
           browser session.

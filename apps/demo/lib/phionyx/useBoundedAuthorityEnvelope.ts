@@ -1,7 +1,7 @@
 /**
  * React hook that wraps the Phionyx bounded-authority envelope library.
  *
- * Each module (Diagnostic / Weekly Reset / Boundary Script) calls
+ * Each module (Household Check / Weekly Reset / Boundary Script) calls
  * `useBoundedAuthorityEnvelope({ traceId, scenarioId, packageVersion })`
  * and gets back:
  *
@@ -32,13 +32,13 @@ interface UseBoundedAuthorityEnvelopeOpts {
   /**
    * Trace identifier for this session's chain. Stable across the
    * module's lifecycle. The pinned reference traces use:
-   *   - "demo-family-diagnostic"
+   *   - "demo-family-household-check"
    *   - "demo-family-weekly-reset"
    *   - "demo-family-boundary-script"
    * but live demo sessions can use anything stable per session.
    */
   traceId: string;
-  /** "diagnostic" | "weekly_reset" | "boundary_script" */
+  /** "household-check" | "weekly_reset" | "boundary_script" */
   scenarioId: string;
   /** semver string for the `subject.version` envelope field */
   packageVersion?: string;

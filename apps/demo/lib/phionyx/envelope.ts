@@ -15,6 +15,8 @@
  *   reproducibility, not unforgeability).
  *
  * No external dependencies — uses Web Crypto API only.
+ *
+ * Phionyx profile: EVIDENCE (the notary). See docs/PHIONYX_PROFILES.md.
  */
 
 export const SCHEMA_ID = "phionyx.bounded_authority_envelope.v1";

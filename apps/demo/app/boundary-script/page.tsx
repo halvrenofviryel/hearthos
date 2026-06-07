@@ -530,10 +530,10 @@ export default function BoundaryScriptPage() {
               Try a Weekly Reset →
             </Link>
             <Link
-              href="/diagnostic"
+              href="/household-check"
               className="text-sm font-medium border border-stone-400 text-slate-700 hover:bg-stone-100 px-4 py-2 rounded transition-colors"
             >
-              ← Back to the Diagnostic
+              ← Back to the Household Check
             </Link>
             <Link
               href="/"
