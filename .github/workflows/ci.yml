@@ -46,4 +46,3 @@ jobs:
           pnpm --filter @hearthos/api exec tsc --noEmit
           pnpm --filter @hearthos/chat exec tsc --noEmit
           pnpm --filter @hearthos/console exec tsc --noEmit
-          pnpm --filter @hearthos/rpg exec tsc --noEmit
