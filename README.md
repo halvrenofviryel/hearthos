@@ -156,7 +156,7 @@ pnpm --filter @hearthos/theme-sdk exec tsc --noEmit
 
 1. **Chat-first.** Human interaction is the primary surface; orchestration happens behind the scenes.
 2. **Theme-agnostic core.** All domain logic lives in `@hearthos/core`; themes are skins.
-3. **Policy-gated.** Every action passes through READ / PROPOSE / EXECUTE evaluation before it lands.
+3. **Policy-gated.** Actions handled by the demo's policy engine are evaluated as READ / PROPOSE / EXECUTE before they land — on the demo's integrated paths, which is not a claim of complete mediation over every possible action.
 4. **Bounded authority.** AI proposes; only the parent executes. High-stakes actions block until approved.
 5. **Offline-capable.** A deterministic mock LLM adapter ships in core — no API key, no network call.
 6. **Auditable.** Every significant action emits an entry; the public-facing UI surfaces these as *activity history*.
@@ -181,7 +181,7 @@ The gates in `@hearthos/core` (`gates/input-safety-gate.ts`, `gates/human-approv
 
 - **Engine** — [`phionyx-core`](https://github.com/halvrenofviryel/phionyx-research) (the deterministic SDK): the full **46-block canonical pipeline (contract v3.8.0)**, the physics-based state telemetry, and the signed audit chain. HearthOS imports **none** of these.
 - **Self-governance gate** — [`phionyx-pipeline-mcp`](https://pypi.org/project/phionyx-pipeline-mcp/): the MCP server that verifies an agent's own "I fixed / I tested / this changed" claims against git-diff truth — distinct from the SDK and from HearthOS.
-- **AI Runtime Evidence Protocol (AIREP)** — [`ai-runtime-evidence-protocol`](https://github.com/halvrenofviryel/ai-runtime-evidence-protocol): a vendor-neutral, *experimental* open format for a per-decision **AI decision receipt** — one signed, hash-chained, offline-checkable record per AI runtime decision (record groups: subject, input, claim, output, evidence, directive, scope, integrity), checkable by two cross-language first-party verifier implementations (Python + Node) over RFC 8785 canonical JSON. It is a *proposed* format, not a ratified standard. AIREP v0.1 is an experimental proposed interchange format. Phionyx currently emits RGE records. RGE is being developed toward AIREP interoperability, but no released conformant RGE→AIREP projection exists yet; therefore Phionyx does not currently claim that RGE records are AIREP-conformant.
+- **AI Runtime Evidence Protocol (AIREP)** — [`ai-runtime-evidence-protocol`](https://github.com/halvrenofviryel/ai-runtime-evidence-protocol): a vendor-neutral, *experimental* open format for a per-decision **AI decision receipt** — one signed, hash-chained, offline-checkable record per AI runtime decision (record groups: subject, input, claim, output, evidence, directive, scope, integrity), checkable by two cross-language first-party verifier implementations (Python + Node) over RFC 8785 canonical JSON. It is a *proposed* format, not a ratified standard. AIREP v0.2.0-beta.1 (9 September 2026) is an experimental prerelease with a first-party producer; the v0.1 line stays frozen and supported. Phionyx currently emits RGE records. RGE is being developed toward AIREP interoperability, but no released conformant RGE→AIREP projection exists yet; therefore Phionyx does not currently claim that RGE records are AIREP-conformant.
 
 HearthOS does not import the full 46-block pipeline, the physics telemetry, or the signed audit chain. Those live in the separate `phionyx-research` ecosystem above.
 
